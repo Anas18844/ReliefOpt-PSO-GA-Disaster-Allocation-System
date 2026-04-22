@@ -1,0 +1,78 @@
+Benchmark: pso+hybrid x 3 scenarios x 10 seeds = 60 runs
+
+--- Per-run results ---
+  pso    | Balanced           | seed=  0 | fit=0.1529 | cov=100.00% | feas=True | 0.56s
+  pso    | Balanced           | seed=  1 | fit=0.1529 | cov=100.00% | feas=True | 0.55s
+  pso    | Balanced           | seed=  2 | fit=0.1529 | cov=100.00% | feas=True | 0.55s
+  pso    | Balanced           | seed=  3 | fit=0.1529 | cov=100.00% | feas=True | 0.54s
+  pso    | Balanced           | seed=  4 | fit=0.1861 | cov=94.59% | feas=True | 0.56s
+  pso    | Balanced           | seed=  5 | fit=0.1529 | cov=100.00% | feas=True | 0.54s
+  pso    | Balanced           | seed=  6 | fit=0.2050 | cov=90.99% | feas=True | 0.55s
+  pso    | Balanced           | seed=  7 | fit=0.1529 | cov=100.00% | feas=True | 0.55s
+  pso    | Balanced           | seed=  8 | fit=0.1529 | cov=100.00% | feas=True | 0.57s
+  pso    | Balanced           | seed=  9 | fit=0.1724 | cov=97.00% | feas=True | 0.54s
+  pso    | High Demand        | seed=  0 | fit=0.5061 | cov=50.00% | feas=True | 0.59s
+  pso    | High Demand        | seed=  1 | fit=0.5056 | cov=50.00% | feas=True | 0.59s
+  pso    | High Demand        | seed=  2 | fit=0.5087 | cov=50.00% | feas=True | 0.60s
+  pso    | High Demand        | seed=  3 | fit=0.5087 | cov=50.00% | feas=True | 0.60s
+  pso    | High Demand        | seed=  4 | fit=0.5056 | cov=50.00% | feas=True | 0.60s
+  pso    | High Demand        | seed=  5 | fit=0.5056 | cov=50.00% | feas=True | 0.65s
+  pso    | High Demand        | seed=  6 | fit=0.5056 | cov=50.00% | feas=True | 0.61s
+  pso    | High Demand        | seed=  7 | fit=0.5075 | cov=50.00% | feas=True | 0.60s
+  pso    | High Demand        | seed=  8 | fit=0.5072 | cov=50.00% | feas=True | 0.60s
+  pso    | High Demand        | seed=  9 | fit=0.5101 | cov=50.00% | feas=True | 0.62s
+  pso    | Resource Scarcity  | seed=  0 | fit=0.3658 | cov=71.32% | feas=True | 0.60s
+  pso    | Resource Scarcity  | seed=  1 | fit=0.3446 | cov=75.58% | feas=True | 0.59s
+  pso    | Resource Scarcity  | seed=  2 | fit=0.3649 | cov=70.74% | feas=True | 0.59s
+  pso    | Resource Scarcity  | seed=  3 | fit=0.3470 | cov=75.58% | feas=True | 0.63s
+  pso    | Resource Scarcity  | seed=  4 | fit=0.3433 | cov=75.58% | feas=True | 0.60s
+  pso    | Resource Scarcity  | seed=  5 | fit=0.3446 | cov=75.58% | feas=True | 0.70s
+  pso    | Resource Scarcity  | seed=  6 | fit=0.3433 | cov=75.58% | feas=True | 0.59s
+  pso    | Resource Scarcity  | seed=  7 | fit=0.3446 | cov=75.58% | feas=True | 0.62s
+  pso    | Resource Scarcity  | seed=  8 | fit=0.3686 | cov=70.74% | feas=True | 0.59s
+  pso    | Resource Scarcity  | seed=  9 | fit=0.3428 | cov=75.58% | feas=True | 0.59s
+  hybrid | Balanced           | seed=  0 | fit=0.1529 | cov=100.00% | feas=True | 0.61s
+  hybrid | Balanced           | seed=  1 | fit=0.1529 | cov=100.00% | feas=True | 0.60s
+  hybrid | Balanced           | seed=  2 | fit=0.1529 | cov=100.00% | feas=True | 0.59s
+  hybrid | Balanced           | seed=  3 | fit=0.1529 | cov=100.00% | feas=True | 0.59s
+  hybrid | Balanced           | seed=  4 | fit=0.1593 | cov=98.89% | feas=True | 0.61s
+  hybrid | Balanced           | seed=  5 | fit=0.1529 | cov=100.00% | feas=True | 0.59s
+  hybrid | Balanced           | seed=  6 | fit=0.1591 | cov=98.84% | feas=True | 0.60s
+  hybrid | Balanced           | seed=  7 | fit=0.1529 | cov=100.00% | feas=True | 0.60s
+  hybrid | Balanced           | seed=  8 | fit=0.1529 | cov=100.00% | feas=True | 0.68s
+  hybrid | Balanced           | seed=  9 | fit=0.1534 | cov=99.92% | feas=True | 0.68s
+  hybrid | High Demand        | seed=  0 | fit=0.5056 | cov=50.00% | feas=True | 0.65s
+  hybrid | High Demand        | seed=  1 | fit=0.5056 | cov=50.00% | feas=True | 0.63s
+  hybrid | High Demand        | seed=  2 | fit=0.5087 | cov=50.00% | feas=True | 0.63s
+  hybrid | High Demand        | seed=  3 | fit=0.5087 | cov=50.00% | feas=True | 0.63s
+  hybrid | High Demand        | seed=  4 | fit=0.5062 | cov=50.00% | feas=True | 0.64s
+  hybrid | High Demand        | seed=  5 | fit=0.5056 | cov=50.00% | feas=True | 0.64s
+  hybrid | High Demand        | seed=  6 | fit=0.5056 | cov=50.00% | feas=True | 0.62s
+  hybrid | High Demand        | seed=  7 | fit=0.5075 | cov=50.00% | feas=True | 0.65s
+  hybrid | High Demand        | seed=  8 | fit=0.5071 | cov=50.00% | feas=True | 0.64s
+  hybrid | High Demand        | seed=  9 | fit=0.5088 | cov=49.89% | feas=True | 0.63s
+  hybrid | Resource Scarcity  | seed=  0 | fit=0.3470 | cov=75.17% | feas=True | 0.64s
+  hybrid | Resource Scarcity  | seed=  1 | fit=0.3447 | cov=75.58% | feas=True | 0.63s
+  hybrid | Resource Scarcity  | seed=  2 | fit=0.3467 | cov=75.48% | feas=True | 0.69s
+  hybrid | Resource Scarcity  | seed=  3 | fit=0.3434 | cov=75.58% | feas=True | 0.72s
+  hybrid | Resource Scarcity  | seed=  4 | fit=0.3433 | cov=75.58% | feas=True | 1.18s
+  hybrid | Resource Scarcity  | seed=  5 | fit=0.3446 | cov=75.58% | feas=True | 0.90s
+  hybrid | Resource Scarcity  | seed=  6 | fit=0.3433 | cov=75.58% | feas=True | 0.74s
+  hybrid | Resource Scarcity  | seed=  7 | fit=0.3446 | cov=75.58% | feas=True | 0.70s
+  hybrid | Resource Scarcity  | seed=  8 | fit=0.3428 | cov=75.58% | feas=True | 0.69s
+  hybrid | Resource Scarcity  | seed=  9 | fit=0.3428 | cov=75.58% | feas=True | 0.80s
+
+--- Aggregate summary ---
+algo   | scenario           | n | mean_fit | std_fit | mean_cov | feas_rate
+--------------------------------------------------------------------------------
+hybrid | Balanced           | 10 | 0.1542 | 0.0026 | 99.77% | 100%
+hybrid | High Demand        | 10 | 0.5069 | 0.0014 | 49.99% | 100%
+hybrid | Resource Scarcity  | 10 | 0.3444 | 0.0015 | 75.53% | 100%
+pso    | Balanced           | 10 | 0.1634 | 0.0186 | 98.26% | 100%
+pso    | High Demand        | 10 | 0.5071 | 0.0016 | 50.00% | 100%
+pso    | Resource Scarcity  | 10 | 0.3510 | 0.0108 | 74.19% | 100%
+
+--- Head-to-head (Hybrid vs PSO, same seed) ---
+  Balanced          : Hybrid wins 3, ties 7, loses 0 / 10
+  High Demand       : Hybrid wins 4, ties 0, loses 6 / 10
+  Resource Scarcity : Hybrid wins 4, ties 5, loses 1 / 10
