@@ -1,0 +1,9 @@
+scenario,rank,selection,crossover,mutation,runs,mean_fitness,best_fitness,worst_fitness,std_fitness,mean_coverage,mean_duration_s,feas_rate
+Resource Scarcity,1,tournament,simple,non_uniform,5,0.34426,0.343334,0.345168,0.000789,0.7548,0.54,1.0
+Resource Scarcity,2,tournament,simple,uniform,5,0.344582,0.343334,0.34713,0.001524,0.7538,0.439,1.0
+Resource Scarcity,3,tournament,whole,non_uniform,5,0.344951,0.343334,0.347454,0.00164,0.7547,0.464,1.0
+Resource Scarcity,4,roulette,whole,non_uniform,5,0.345659,0.343334,0.353196,0.004246,0.7518,0.438,1.0
+Resource Scarcity,5,tournament,whole,uniform,5,0.345845,0.343334,0.349327,0.002662,0.7534,0.525,1.0
+Resource Scarcity,6,roulette,simple,uniform,5,0.347931,0.343334,0.353951,0.004572,0.7493,0.435,1.0
+Resource Scarcity,7,roulette,simple,non_uniform,5,0.348239,0.343334,0.356349,0.005208,0.7487,0.542,1.0
+Resource Scarcity,8,roulette,whole,uniform,5,0.351265,0.343334,0.363398,0.008904,0.7466,0.511,1.0
