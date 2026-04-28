@@ -1,10 +1,3 @@
-"""
-Streamlit UI for the Disaster Relief EA project.
-
-Run with:
-    streamlit run ui/app.py
-"""
-
 from __future__ import annotations
 import sys
 from pathlib import Path
