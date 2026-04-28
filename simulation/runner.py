@@ -170,15 +170,6 @@ def run_operator_comparison(
     scenario_seed: Optional[int] = None,
     verbose: bool = False,
 ) -> Dict:
-    """Run a full factorial of GA operator combinations on the hybrid solver.
-
-    For each (selection, crossover, mutation) triple, runs `len(seeds)` seeds
-    and aggregates mean/best/std of fitness + coverage + duration.
-
-    Returns a dict with:
-        "runs":    list[RunResult]         — every individual run
-        "summary": list[dict]              — one row per operator combo
-    """
     selections = selections or list(SELECTION_OPERATORS.keys())
     crossovers = crossovers or list(CROSSOVER_OPERATORS.keys())
     mutations  = mutations  or list(MUTATION_OPERATORS.keys())
