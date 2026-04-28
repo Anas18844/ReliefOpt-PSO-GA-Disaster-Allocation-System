@@ -1,11 +1,3 @@
-"""
-Solution validator + human-readable report.
-
-The repair operator should guarantee feasibility, but we validate anyway —
-this is how we catch bugs in the algorithm, and it's also what we show to
-the grader in experiments.
-"""
-
 from __future__ import annotations
 from typing import Dict
 import numpy as np
@@ -30,11 +22,6 @@ def check_constraints(solution: np.ndarray, scenario,
 
 
 def solution_report(solution: np.ndarray, scenario) -> Dict:
-    """Build a compact report — what % of each region's demand got met,
-    total delivered, remaining shortage, etc.
-
-    Used by experiments and the Streamlit UI.
-    """
     alloc = np.asarray(solution, dtype=float).reshape(
         scenario.num_regions, scenario.num_resources
     )

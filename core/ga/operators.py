@@ -1,19 +1,3 @@
-"""
-Genetic operators: selection, crossover, mutation.
-
-Each operator is a plain function so it's easy to swap, test, and reuse in
-the hybrid solver. An explicit `rng` (numpy Generator) is passed in for
-reproducibility.
-
-A "genome" here is a flat numpy array (the same vector shape PSO uses).
-That consistency lets the hybrid stage pick up PSO particles and feed
-them straight into GA operators.
-
-Operator registries at the bottom of the file expose every operator by
-short name so the hybrid solver / UI / CLI can pick one without the
-caller importing the function directly.
-"""
-
 from __future__ import annotations
 from typing import Callable, Dict, List, Tuple
 import numpy as np
@@ -26,7 +10,6 @@ import numpy as np
 
 def tournament_selection(pool: List[np.ndarray], fitness: np.ndarray,
                          rng: np.random.Generator, k: int = 3) -> np.ndarray:
-    """Pick `k` random candidates; return the best one (copy)."""
     k = max(2, min(k, len(pool)))
     idx = rng.choice(len(pool), size=k, replace=False)
     best = idx[np.argmin(fitness[idx])]
@@ -35,11 +18,6 @@ def tournament_selection(pool: List[np.ndarray], fitness: np.ndarray,
 
 def roulette_selection(pool: List[np.ndarray], fitness: np.ndarray,
                        rng: np.random.Generator, k: int = 3) -> np.ndarray:
-    """Inverse-fitness weighted roulette wheel.
-
-    Since we minimise, we invert: weight = 1 / (fitness + eps).
-    `k` is accepted for a uniform selection signature but unused here.
-    """
     weights = 1.0 / (np.asarray(fitness) + 1e-9)
     weights = weights / weights.sum()
     idx = rng.choice(len(pool), p=weights)
@@ -53,7 +31,7 @@ def roulette_selection(pool: List[np.ndarray], fitness: np.ndarray,
 def whole_arithmetic_crossover(p1: np.ndarray, p2: np.ndarray,
                                rng: np.random.Generator,
                                alpha: float = 0.5) -> Tuple[np.ndarray, np.ndarray]:
-    """Blend the whole genomes:  c1 = a*p1 + (1-a)*p2,  c2 = (1-a)*p1 + a*p2."""
+    """c1 = a*p1 + (1-a)*p2,  c2 = (1-a)*p1 + a*p2."""
     c1 = alpha * p1 + (1.0 - alpha) * p2
     c2 = (1.0 - alpha) * p1 + alpha * p2
     return c1, c2
@@ -62,7 +40,6 @@ def whole_arithmetic_crossover(p1: np.ndarray, p2: np.ndarray,
 def simple_arithmetic_crossover(p1: np.ndarray, p2: np.ndarray,
                                 rng: np.random.Generator,
                                 alpha: float = 0.5) -> Tuple[np.ndarray, np.ndarray]:
-    """Keep genes [0:k] from the parents, then arithmetically blend the tail."""
     c1 = p1.copy()
     c2 = p2.copy()
     k = int(rng.integers(1, len(p1)))   # cut-point in [1, n-1]
@@ -79,11 +56,6 @@ def uniform_mutation(genome: np.ndarray, low: float, high: float,
                      rng: np.random.Generator,
                      current_iter: int = 0, max_iter: int = 1,
                      rate: float = 0.1) -> np.ndarray:
-    """Each gene has `rate` probability to be replaced with U(low, high).
-
-    `current_iter` / `max_iter` accepted for a uniform mutation signature
-    but unused here — they matter for non_uniform_mutation.
-    """
     mask = rng.random(genome.shape) < rate
     new_genes = rng.uniform(low, high, size=genome.shape)
     return np.where(mask, new_genes, genome)
@@ -93,10 +65,6 @@ def non_uniform_mutation(genome: np.ndarray, low: float, high: float,
                          rng: np.random.Generator,
                          current_iter: int = 0, max_iter: int = 1,
                          rate: float = 0.1, b: float = 2.0) -> np.ndarray:
-    """Perturbation size shrinks as the run progresses (Michalewicz 1996).
-
-    Early on we jump far (exploration); near the end we nudge (exploitation).
-    """
     progress = current_iter / max(1, max_iter)
     mask = rng.random(genome.shape) < rate
 

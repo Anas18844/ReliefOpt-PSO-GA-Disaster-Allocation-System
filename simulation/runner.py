@@ -1,19 +1,3 @@
-"""
-High-level runner for experiments.
-
-Provides:
-  - run_single:       one (algorithm, scenario, seed) combination
-  - run_experiments:  batch over scenarios/algorithms/seeds
-  - run_operator_comparison: factorial over GA operator combinations
-                             (selection x crossover x mutation) for the
-                             hybrid solver, with per-seed repetition.
-
-Each run returns a RunResult dict-view with: final fitness, history,
-feasibility flag, coverage summary, and — for hybrid runs — the three
-operator names actually used. That metadata is what makes the comparison
-CSV meaningful.
-"""
-
 from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field

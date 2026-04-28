@@ -1,17 +1,3 @@
-"""
-Disaster scenario model.
-
-A scenario describes:
-  - a set of affected regions (each with 2D coordinates)
-  - each region's demand for every resource type (food, water, medicine)
-  - the total supply of each resource available at the warehouse
-  - the warehouse location (for transport distance)
-
-The decision variable in our optimization problem is an allocation matrix:
-    allocation[i, j] = amount of resource j sent to region i
-We flatten this matrix into a 1D vector when we hand it to PSO/GA.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -25,8 +11,6 @@ RESOURCE_NAMES = ("food", "water", "medicine")
 
 @dataclass
 class DisasterScenario:
-    """One disaster instance the algorithm has to solve."""
-
     name: str
     num_regions: int
     available_resources: np.ndarray          # shape (num_resources,)
@@ -121,11 +105,6 @@ SCENARIO_PRESETS: Dict[str, callable] = {
 
 def make_scenario(name: str, num_regions: Optional[int] = None,
                   seed: Optional[int] = None) -> DisasterScenario:
-    """Factory — build a scenario by preset name.
-
-    Extra args override the preset defaults (so the UI can let the user tweak
-    the number of regions or the random seed).
-    """
     if name not in SCENARIO_PRESETS:
         raise ValueError(
             f"Unknown scenario '{name}'. Choose from: {list(SCENARIO_PRESETS)}"

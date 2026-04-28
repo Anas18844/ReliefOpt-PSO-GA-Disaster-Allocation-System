@@ -1,20 +1,3 @@
-"""
-Hybrid PSO → GA solver.
-
-Idea:
-    PSO sweeps the space quickly; GA refines through recombination + targeted
-    mutation. We run PSO for the first `pso_fraction` of the budget, take the
-    evolved swarm as a seeded GA population, then run GA for the remaining
-    iterations with elitism so we never lose the best-so-far.
-
-GA operators (selection / crossover / mutation) are looked up by NAME from
-core.ga.operators registries, so the same solver can run any combination
-without code changes.
-
-Contract: same public interface as PSOSolver.run() — returns
-(best_position, best_fitness, history, diversity_history).
-"""
-
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
@@ -137,11 +120,6 @@ class HybridPSOGASolver:
 
     def _next_generation(self, population: List[np.ndarray], fitness: np.ndarray,
                          current_iter: int, max_iter: int) -> List[np.ndarray]:
-        """Build the next population: elitism + selection + crossover + mutation.
-
-        Selection, crossover and mutation are resolved from the config so
-        any registered operator works without code changes here.
-        """
         cfg = self.config
         n = len(population)
 

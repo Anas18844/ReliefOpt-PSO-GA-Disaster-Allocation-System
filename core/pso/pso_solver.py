@@ -1,25 +1,3 @@
-"""
-Particle Swarm Optimisation solver.
-
-Workflow per iteration:
-  1. Repair every particle (forces feasibility).
-  2. Score every particle with the fitness function.
-  3. Update personal best (pBest) and global best (gBest).
-  4. Update velocity:
-         v = w*v + c1*r1*(pBest - x) + c2*r2*(gBest - x)
-  5. Apply velocity clamp, then move: x = x + v.
-  6. Keep a history of gBest fitness so we can plot convergence.
-
-Improvements over the baseline repo:
-  - Fixed Particle constructor (used to be called with wrong argument).
-  - Linear inertia decay w: w_max → w_min, encourages exploration early,
-    exploitation late.
-  - Velocity clamp v_max so the swarm doesn't explode numerically.
-  - Position bounds so particles stay in a sensible range; repair handles
-    the feasibility constraints separately.
-  - Reproducible randomness via a numpy Generator.
-"""
-
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
@@ -100,12 +78,6 @@ class PSOSolver:
 
     def run(self, verbose: bool = False
             ) -> Tuple[np.ndarray, float, List[float], List[float]]:
-        """Run the swarm for `iterations` steps.
-
-        Returns:
-            best_position, best_fitness, convergence_history, diversity_history
-            (diversity = mean std-dev of particle positions across dimensions)
-        """
         history: List[float] = []
         diversity_history: List[float] = []
 
