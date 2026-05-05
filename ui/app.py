@@ -195,9 +195,13 @@ with tab_single:
         for a in algos_to_run:
             r = all_results[a][0]
             for i, cov in enumerate(r.per_region_coverage):
-                rows.append({"algorithm": a.upper(), "region": f"R{i}", "coverage": cov})
+                rows.append({"algorithm": a.upper(), "region_idx": i,
+                             "region": f"R{i}", "coverage": cov})
         cov_df = pd.DataFrame(rows)
-        pivoted = cov_df.pivot(index="region", columns="algorithm", values="coverage")
+        pivoted = (cov_df
+                   .pivot(index=["region_idx", "region"], columns="algorithm", values="coverage")
+                   .sort_index(level="region_idx")
+                   .droplevel("region_idx"))
         st.dataframe(pivoted.style.format("{:.1%}").background_gradient(cmap="RdYlGn"))
 
         # --- Run details ---
@@ -207,7 +211,16 @@ with tab_single:
             for r in all_results[a]:
                 detail_rows.append(r.as_dict())
         detail_df = pd.DataFrame(detail_rows)
-        st.dataframe(detail_df)
+        st.dataframe(
+            detail_df.style.format({
+                "fitness": "{:.4f}",
+                "duration_s": "{:.2f}s",
+                "overall_coverage": "{:.2%}",
+                "mean_coverage": "{:.2%}",
+                "total_shortage": "{:.1f}",
+                "final_diversity": "{:.4f}",
+            })
+        )
         st.download_button(
             "Download run details (CSV)",
             detail_df.to_csv(index=False).encode("utf-8"),
@@ -289,9 +302,9 @@ with tab_ops:
                     "best_fitness": "{:.5f}",
                     "worst_fitness": "{:.5f}",
                     "std_fitness": "{:.5f}",
-                    "mean_coverage": "{:.3f}",
-                    "mean_duration_s": "{:.2f}",
-                    "feas_rate": "{:.2f}",
+                    "mean_coverage": "{:.2%}",
+                    "mean_duration_s": "{:.2f}s",
+                    "feas_rate": "{:.0%}",
                 })
                 .background_gradient(subset=["mean_fitness"], cmap="RdYlGn_r")
             )
@@ -299,7 +312,16 @@ with tab_ops:
             runs_df = pd.DataFrame([r.as_dict() for r in out["runs"]])
             runs_df.insert(0, "scenario", scenario_name)
             with st.expander(f"All {len(runs_df)} individual runs"):
-                st.dataframe(runs_df)
+                st.dataframe(
+                    runs_df.style.format({
+                        "fitness": "{:.4f}",
+                        "duration_s": "{:.2f}s",
+                        "overall_coverage": "{:.2%}",
+                        "mean_coverage": "{:.2%}",
+                        "total_shortage": "{:.1f}",
+                        "final_diversity": "{:.4f}",
+                    })
+                )
 
             col_dl1, col_dl2 = st.columns(2)
             with col_dl1:
