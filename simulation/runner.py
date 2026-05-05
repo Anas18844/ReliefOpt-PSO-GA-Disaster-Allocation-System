@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 import time
 import numpy as np
 
+from core.ga.ga_solver import GASolver, GAConfig
 from problem import make_scenario, solution_report
 from core.pso.pso_solver import PSOSolver, PSOConfig
 from core.hybrid.hybrid_solver import HybridPSOGASolver, HybridConfig
@@ -13,8 +14,7 @@ from core.ga.operators import (
     SELECTION_OPERATORS, CROSSOVER_OPERATORS, MUTATION_OPERATORS,
 )
 
-
-ALGO_CHOICES = ("pso", "hybrid")
+ALGO_CHOICES = ("pso", "ga", "hybrid")
 
 
 @dataclass
@@ -32,7 +32,6 @@ class RunResult:
     mean_coverage: float
     total_shortage: float
     best_position: np.ndarray = field(repr=False)
-    # Operator metadata (None for pure PSO).
     selection: Optional[str] = None
     crossover: Optional[str] = None
     mutation: Optional[str]  = None
@@ -81,6 +80,15 @@ def _build_solver(algorithm: str, scenario, rng,
             ),
             rng=rng,
         )
+
+    if algorithm == "ga":
+        return GASolver(
+            scenario,
+            GAConfig(pop_size=pop_size, iterations=iterations,
+                     selection=selection, crossover=crossover, mutation=mutation),
+            rng=rng,
+        )
+
     raise ValueError(f"Unknown algorithm '{algorithm}'. Choose: {ALGO_CHOICES}")
 
 
@@ -120,9 +128,9 @@ def run_single(algorithm: str, scenario_name: str,
         mean_coverage=report["mean_coverage"],
         total_shortage=report["total_shortage"],
         best_position=best_pos,
-        selection=selection if algorithm == "hybrid" else None,
-        crossover=crossover if algorithm == "hybrid" else None,
-        mutation=mutation  if algorithm == "hybrid" else None,
+        selection=selection if algorithm in ("hybrid", "ga") else None,
+        crossover=crossover if algorithm in ("hybrid", "ga") else None,
+        mutation=mutation  if algorithm in ("hybrid", "ga") else None,
     )
 
 
@@ -133,7 +141,6 @@ def run_experiments(algorithms: List[str], scenarios: List[str],
                     crossover: str = "whole",
                     mutation: str  = "non_uniform",
                     verbose: bool = False) -> List[RunResult]:
-    """Full factorial over (algorithm x scenario x seed)."""
     results: List[RunResult] = []
     total = len(algorithms) * len(scenarios) * len(seeds)
     i = 0
@@ -152,10 +159,6 @@ def run_experiments(algorithms: List[str], scenarios: List[str],
                 ))
     return results
 
-
-# ---------------------------------------------------------------------------
-# Operator comparison
-# ---------------------------------------------------------------------------
 
 def run_operator_comparison(
     scenario_name: str,
@@ -217,6 +220,32 @@ def run_operator_comparison(
             "feas_rate":      round(sum(1 for r in runs if r.feasible) / len(runs), 3),
         })
 
-    # Rank by mean fitness (lower is better).
     summary.sort(key=lambda row: row["mean_fitness"])
     return {"runs": all_runs, "summary": summary}
+
+
+def run_ga_config_study(scenario_name: str, seeds: List[int],
+                        iterations: int = 100, pop_size: int = 30):
+    """Compare three GA configurations against PSO across the given seeds."""
+    configs = [
+        {"name": "GA_Explorative", "mut": "uniform", "cx": "simple"},
+        {"name": "GA_Refined", "mut": "non_uniform", "cx": "whole"},
+        {"name": "PSO_Standard", "algo": "pso"},
+    ]
+
+    results = []
+    for cfg in configs:
+        for seed in seeds:
+            algo = cfg.get("algo", "ga")
+            res = run_single(
+                algorithm=algo,
+                scenario_name=scenario_name,
+                iterations=iterations,
+                pop_size=pop_size,
+                seed=seed,
+                mutation=cfg.get("mut", "non_uniform"),
+                crossover=cfg.get("cx", "whole"),
+            )
+            res.algorithm = cfg["name"]
+            results.append(res)
+    return results

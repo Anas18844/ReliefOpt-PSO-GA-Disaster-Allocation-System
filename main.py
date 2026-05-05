@@ -3,9 +3,10 @@ Command-line entry point for the Disaster Relief EA project.
 
 Examples:
     python main.py --algo pso --scenario Balanced --iters 150
+    python main.py --algo ga  --scenario Balanced --selection roulette --crossover simple --mutation uniform
     python main.py --algo hybrid --scenario "High Demand" --selection roulette --crossover simple --mutation uniform
     python main.py --algo both --scenario all --iters 100 --pop 30 --seed 7
-    python main.py --benchmark                                 # full 30-run study
+    python main.py --benchmark                                 # full pso+ga+hybrid study
     python main.py --compare-ops --scenario Balanced           # GA operator factorial
     python main.py --compare-ops --scenario Balanced --export experiments/ops.csv
 """
@@ -22,9 +23,8 @@ from core.ga.operators import (
 )
 from problem import SCENARIO_PRESETS
 
-
 ALL_SCENARIOS = list(SCENARIO_PRESETS.keys())
-ALGO_CHOICES = ("pso", "hybrid", "both")
+ALGO_CHOICES = ("pso", "ga", "hybrid", "both")
 SELECTION_CHOICES = list(SELECTION_OPERATORS.keys())
 CROSSOVER_CHOICES = list(CROSSOVER_OPERATORS.keys())
 MUTATION_CHOICES  = list(MUTATION_OPERATORS.keys())
@@ -33,7 +33,7 @@ MUTATION_CHOICES  = list(MUTATION_OPERATORS.keys())
 def _print_run(result) -> None:
     c = result.as_dict()
     ops = ""
-    if result.algorithm == "hybrid":
+    if result.algorithm in ("hybrid", "ga"):
         ops = f" | {c['selection']}/{c['crossover']}/{c['mutation']}"
     print(
         f"  {c['algorithm']:6s} | {c['scenario']:18s} | seed={c['seed']:3d} "
@@ -57,7 +57,10 @@ def _export_csv(rows, path: Path) -> None:
 
 def cmd_single(args: argparse.Namespace) -> None:
     scenarios = ALL_SCENARIOS if args.scenario == "all" else [args.scenario]
-    algos = ["pso", "hybrid"] if args.algo == "both" else [args.algo]
+    if args.algo == "both":
+        algos = ["pso", "ga", "hybrid"]
+    else:
+        algos = [args.algo]
 
     print(f"Running {len(algos)} x {len(scenarios)} combination(s)...")
     for algo in algos:
@@ -75,11 +78,12 @@ def cmd_single(args: argparse.Namespace) -> None:
 
 def cmd_benchmark(args: argparse.Namespace) -> None:
     seeds = list(range(args.runs))
-    print(f"Benchmark: pso+hybrid x {len(ALL_SCENARIOS)} scenarios x {len(seeds)} seeds"
-          f" = {2 * len(ALL_SCENARIOS) * len(seeds)} runs")
+    algos = ["pso", "ga", "hybrid"]
+    print(f"Benchmark: {'+'.join(algos)} x {len(ALL_SCENARIOS)} scenarios x {len(seeds)} seeds"
+          f" = {len(algos) * len(ALL_SCENARIOS) * len(seeds)} runs")
 
     results = run_experiments(
-        algorithms=["pso", "hybrid"],
+        algorithms=algos,
         scenarios=ALL_SCENARIOS,
         seeds=seeds,
         iterations=args.iters,
@@ -176,7 +180,7 @@ def cmd_compare_ops(args: argparse.Namespace) -> None:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Disaster Relief EA — PSO & Hybrid")
+    parser = argparse.ArgumentParser(description="Disaster Relief EA — PSO, GA & Hybrid")
 
     parser.add_argument("--algo", choices=ALGO_CHOICES, default="pso")
     parser.add_argument("--scenario", default="Balanced",
@@ -187,7 +191,6 @@ def main(argv=None) -> int:
     parser.add_argument("--pso-frac", dest="pso_frac", type=float, default=0.6,
                         help="Fraction of iterations used by PSO in hybrid mode.")
 
-    # GA operator knobs (hybrid only).
     parser.add_argument("--selection", choices=SELECTION_CHOICES, default="tournament")
     parser.add_argument("--crossover", choices=CROSSOVER_CHOICES, default="whole")
     parser.add_argument("--mutation",  choices=MUTATION_CHOICES,  default="non_uniform")

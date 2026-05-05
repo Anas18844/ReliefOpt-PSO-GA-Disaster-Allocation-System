@@ -21,11 +21,9 @@ from utils.plotting import (
     plot_diversity,
 )
 
-
 st.set_page_config(page_title="Disaster Relief EA", layout="wide")
 st.title("Disaster Relief Resource Allocation")
-st.caption("PSO and Hybrid PSO+GA — Evolutionary Algorithms project")
-
+st.caption("PSO, GA, and Hybrid PSO+GA — Evolutionary Algorithms project")
 
 # ---------- Sidebar controls ----------
 st.sidebar.header("Scenario")
@@ -33,13 +31,13 @@ scenario_name = st.sidebar.selectbox("Preset", list(SCENARIO_PRESETS.keys()))
 num_regions = st.sidebar.slider("Number of regions", 3, 20, 6)
 scenario_seed = st.sidebar.number_input("Scenario seed", value=1, step=1)
 
-st.sidebar.header("Algorithm")
-mode = st.sidebar.radio("Mode", ["PSO", "Hybrid (PSO → GA)"])
+st.sidebar.header("Algorithm Settings")
+mode = st.sidebar.radio("Mode", ["PSO", "GA", "Hybrid (PSO → GA)"])
 iterations = st.sidebar.slider("Iterations", 20, 500, 100, step=10)
 pop_size = st.sidebar.slider("Population size", 10, 100, 30, step=5)
 pso_fraction = st.sidebar.slider("PSO fraction (hybrid only)", 0.1, 1.0, 0.6, step=0.05)
 
-st.sidebar.header("GA operators (hybrid only)")
+st.sidebar.header("GA Operators (GA & Hybrid)")
 selection_name = st.sidebar.selectbox("Selection", list(SELECTION_OPERATORS.keys()), index=0)
 crossover_name = st.sidebar.selectbox("Crossover", list(CROSSOVER_OPERATORS.keys()), index=0)
 mutation_name = st.sidebar.selectbox("Mutation", list(MUTATION_OPERATORS.keys()), index=1)
@@ -47,17 +45,15 @@ mutation_name = st.sidebar.selectbox("Mutation", list(MUTATION_OPERATORS.keys())
 st.sidebar.header("Reproducibility")
 algo_seed = st.sidebar.number_input("Algorithm seed", value=0, step=1)
 
-compare_mode = st.sidebar.checkbox("Compare PSO vs Hybrid side-by-side", value=False)
+compare_mode = st.sidebar.checkbox("Compare PSO vs GA vs Hybrid", value=False)
 repeat_runs = st.sidebar.slider("Repeat runs (for variance plot)", 1, 15, 1)
 
-
 # ---------- Tabs ----------
-tab_single, tab_ops = st.tabs(["Single run / Compare PSO vs Hybrid",
+tab_single, tab_ops = st.tabs(["Single run / Comparative Analysis",
                                "GA operator comparison"])
 
-
 # ======================================================================
-# Tab 1 — single run or PSO vs Hybrid side-by-side
+# Tab 1 — single run or PSO vs GA vs Hybrid side-by-side
 # ======================================================================
 with tab_single:
     run_button = st.button("Run optimisation", type="primary", key="run_single")
@@ -97,16 +93,20 @@ with tab_single:
         st.pyplot(plot_map(scenario, title=f"{scenario.name} — regions & warehouse"))
 
     if run_button:
-        algo_name = "pso" if mode == "PSO" else "hybrid"
-        algos_to_run = ["pso", "hybrid"] if compare_mode else [algo_name]
+        if compare_mode:
+            algos_to_run = ["pso", "ga", "hybrid"]
+        else:
+            algo_map = {"PSO": "pso", "GA": "ga", "Hybrid (PSO → GA)": "hybrid"}
+            algos_to_run = [algo_map[mode]]
 
         st.divider()
         st.subheader("Results")
 
-        # Show active operator choice for any hybrid runs.
-        if "hybrid" in algos_to_run:
+        active_ga_algos = [a for a in algos_to_run if a in ("ga", "hybrid")]
+        if active_ga_algos:
             st.info(
-                f"Hybrid GA operators: **selection = {selection_name}**, "
+                f"GA Settings (used by {', '.join(a.upper() for a in active_ga_algos)}): "
+                f"**selection = {selection_name}**, "
                 f"**crossover = {crossover_name}**, **mutation = {mutation_name}**"
             )
 
@@ -136,61 +136,61 @@ with tab_single:
             r = all_results[a][0]
             with headline_cols[i]:
                 st.markdown(f"### {a.upper()}")
-                if a == "hybrid":
-                    st.caption(f"{r.selection} / {r.crossover} / {r.mutation}")
+                if a in ("hybrid", "ga"):
+                    st.caption(f"{selection_name} / {crossover_name} / {mutation_name}")
                 st.metric("Best fitness", f"{r.fitness:.4f}")
                 st.metric("Overall coverage", f"{r.overall_coverage:.2%}")
                 st.metric("Mean region coverage", f"{r.mean_coverage:.2%}")
                 st.metric("Total shortage", f"{r.total_shortage:.1f}")
                 st.metric("Final diversity", f"{r.final_diversity:.4f}")
-                st.metric("Feasible", "Done" if r.feasible else "Failed")
+                st.metric("Feasible", "Yes" if r.feasible else "No")
                 st.caption(f"Runtime: {r.duration_s:.2f}s")
 
         # --- Convergence ---
         st.subheader("Convergence")
         hist_dict = {a.upper(): all_results[a][0].history for a in algos_to_run}
-        st.pyplot(plot_convergence(hist_dict, title=f"{scenario.name} — best fitness per iteration"))
+        st.pyplot(plot_convergence(hist_dict, title=f"{scenario_name} — Best Fitness Comparison"))
 
         # --- Diversity ---
-        st.subheader("Population diversity")
+        st.subheader("Population Diversity")
         st.caption(
             "Mean per-dimension std-dev of the population. Starts high (random init), "
             "drops as the algorithm converges. A curve that flattens near zero too early "
             "signals premature convergence."
         )
         div_dict = {a.upper(): all_results[a][0].diversity_history for a in algos_to_run}
-        st.pyplot(plot_diversity(div_dict, title=f"{scenario.name} — diversity per iteration"))
+        st.pyplot(plot_diversity(div_dict, title=f"{scenario_name} — Diversity Comparison"))
 
         # --- Allocation heatmap ---
-        st.subheader("Allocation vs demand")
+        st.subheader("Allocation vs Demand")
         for a in algos_to_run:
             best = all_results[a][0].best_position
             alloc = best.reshape(scenario.num_regions, scenario.num_resources)
             st.markdown(f"**{a.upper()}**")
             st.pyplot(plot_allocation_heatmap(
                 alloc, scenario.demands,
-                title=f"{a.upper()} — allocation vs demand",
+                title=f"{a.upper()} — Allocation vs Demand",
             ))
 
         # --- Delivery map ---
-        st.subheader("Delivery map")
+        st.subheader("Delivery Map")
         map_cols = st.columns(len(algos_to_run))
         for i, a in enumerate(algos_to_run):
             with map_cols[i]:
                 st.pyplot(plot_map(
                     scenario,
                     allocation=all_results[a][0].best_position,
-                    title=f"{a.upper()} delivery",
+                    title=f"{a.upper()} Delivery",
                 ))
 
         # --- Variance plot ---
         if repeat_runs > 1:
             st.subheader(f"Variance across {repeat_runs} runs")
             comp = {a.upper(): [r.fitness for r in all_results[a]] for a in algos_to_run}
-            st.pyplot(plot_comparison(comp, title="Final fitness distribution"))
+            st.pyplot(plot_comparison(comp, title="Final Fitness Distribution"))
 
         # --- Per-region coverage ---
-        st.subheader("Per-region coverage")
+        st.subheader("Per-region Coverage")
         rows = []
         for a in algos_to_run:
             r = all_results[a][0]
@@ -215,12 +215,11 @@ with tab_single:
             mime="text/csv",
         )
 
-
 # ======================================================================
 # Tab 2 — GA operator comparison
 # ======================================================================
 with tab_ops:
-    st.subheader("GA operator comparison")
+    st.subheader("GA Operator Comparison")
     st.write(
         "Runs the Hybrid PSO→GA solver across a factorial of "
         "**selection × crossover × mutation** combinations, each for "
@@ -247,7 +246,7 @@ with tab_ops:
             default=list(MUTATION_OPERATORS.keys()),
         )
 
-    ops_runs = st.slider("Seeds per combination", 1, 10, 3)
+    ops_runs = st.slider("Seeds per combination", 1, 50, 3)
 
     n_combos = max(1, len(sel_choice) * len(cx_choice) * len(mut_choice))
     st.caption(
@@ -256,7 +255,7 @@ with tab_ops:
         f"on scenario '{scenario_name}'."
     )
 
-    run_ops_btn = st.button("Run comparison", type="primary", key="run_ops")
+    run_ops_btn = st.button("Run Comparison", type="primary", key="run_ops")
 
     if run_ops_btn:
         if not (sel_choice and cx_choice and mut_choice):
@@ -283,7 +282,6 @@ with tab_ops:
             st.success(f"Done. Ranked {len(summary_df)} configurations by mean fitness "
                        f"(lower is better).")
 
-            # Highlight best row.
             st.dataframe(
                 summary_df.style
                 .format({
@@ -298,13 +296,11 @@ with tab_ops:
                 .background_gradient(subset=["mean_fitness"], cmap="RdYlGn_r")
             )
 
-            # Per-run breakdown
             runs_df = pd.DataFrame([r.as_dict() for r in out["runs"]])
             runs_df.insert(0, "scenario", scenario_name)
             with st.expander(f"All {len(runs_df)} individual runs"):
                 st.dataframe(runs_df)
 
-            # Downloads
             col_dl1, col_dl2 = st.columns(2)
             with col_dl1:
                 st.download_button(

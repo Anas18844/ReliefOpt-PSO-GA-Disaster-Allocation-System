@@ -69,7 +69,7 @@ class PSOSolver:
             p.velocity = w * p.velocity + cognitive + social
             np.clip(p.velocity, -self._v_max, self._v_max, out=p.velocity)
 
-            p.position = p.position + p.velocity
+            p.position = p.position + p.velocity # X = X + V
             np.clip(p.position, self._pos_low, self._pos_high, out=p.position)
 
     # ------------------------------------------------------------------
